@@ -9,7 +9,7 @@ export default function ChatBox() {
     realEstateConversation[0].question
   );
   const [step, setStep] = useState(0);
-
+  const [completed, setCompleted] = useState(false);
   const [lead, setLead] = useState({
   goal: "",
   location: "",
@@ -21,40 +21,49 @@ export default function ChatBox() {
 });
 
   function sendMessage() {
-    if (step < realEstateConversation.length - 1) {
-      if (step === 1) {
-  setLead((prev) => ({
-    ...prev,
-    location: message,
-  }));
-}
+  if (!message.trim()) return;
 
-if (step === 2) {
-  setLead((prev) => ({
-    ...prev,
-    budget: message,
-  }));
-}
+  const currentField = realEstateConversation[step].field;
 
-if (step === 3) {
-  setLead((prev) => ({
-    ...prev,
-    timeline: message,
-  }));
-}
-      const nextStep = step + 1;
-
-      setStep(nextStep);
-      setReply(realEstateConversation[nextStep].question);
-      setMessage("");
-    } else {
-      setReply(
-        "🎉 Thanks! We'll connect you with the perfect real estate professional soon."
-      );
-      setMessage("");
-    }
+  if (currentField) {
+    setLead((prev) => ({
+      ...prev,
+      [currentField]: message,
+    }));
   }
 
+  if (step < realEstateConversation.length - 1) {
+    const nextStep = step + 1;
+
+    setStep(nextStep);
+    setReply(realEstateConversation[nextStep].question);
+  } else {
+  setReply(
+    "🎉 Thanks! Your information has been saved. A real estate professional will follow up shortly."
+  );
+  setCompleted(true);
+}
+
+  setMessage("");
+}
+
+function resetDemo() {
+  setMessage("");
+  setStep(0);
+  setCompleted(false);
+
+  setLead({
+    goal: "",
+    location: "",
+    budget: "",
+    timeline: "",
+    name: "",
+    email: "",
+    phone: "",
+  });
+
+  setReply(realEstateConversation[0].question);
+}
   return (
   <div className="mx-auto mt-10 w-full max-w-md rounded-2xl bg-white p-6 text-black shadow-xl">
     <h2 className="text-xl font-bold">
@@ -79,17 +88,30 @@ if (step === 3) {
       Send Message
     </button>
 
-    <div className="mt-6 rounded-lg bg-gray-100 p-4 text-sm">
-      <h3 className="font-bold text-lg mb-3">Lead Profile</h3>
+    {completed && (
+  <div className="mt-6 rounded-xl bg-blue-50 p-5 text-sm shadow">
+    <h3 className="mb-4 text-xl font-bold text-blue-700">
+      🎉 New Lead Captured
+    </h3>
 
-      <p><strong>Goal:</strong> {lead.goal || "-"}</p>
-      <p><strong>Location:</strong> {lead.location || "-"}</p>
-      <p><strong>Budget:</strong> {lead.budget || "-"}</p>
-      <p><strong>Timeline:</strong> {lead.timeline || "-"}</p>
-      <p><strong>Name:</strong> {lead.name || "-"}</p>
-      <p><strong>Email:</strong> {lead.email || "-"}</p>
-      <p><strong>Phone:</strong> {lead.phone || "-"}</p>
-    </div>
+    <p><strong>Goal:</strong> {lead.goal || "-"}</p>
+    <p><strong>Location:</strong> {lead.location || "-"}</p>
+    <p><strong>Budget:</strong> {lead.budget || "-"}</p>
+    <p><strong>Timeline:</strong> {lead.timeline || "-"}</p>
+
+    <hr className="my-3" />
+
+    <p><strong>Name:</strong> {lead.name || "-"}</p>
+    <p><strong>Email:</strong> {lead.email || "-"}</p>
+    <p><strong>Phone:</strong> {lead.phone || "-"}</p>
+  </div>
+)}
+      <button
+      onClick={resetDemo}
+      className="mt-4 w-full rounded-lg bg-gray-800 px-4 py-3 font-semibold text-white"
+    >
+      Start New Demo
+    </button>
   </div>
 );
 }
