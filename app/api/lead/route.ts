@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
   await resend.emails.send({
     from: "UpStar AI <onboarding@resend.dev>",
-    to: "yourname@gmail.com",
+    to: "savannahgraf@gmail.com",
     subject: "New UpStar AI Lead",
     text: `
 New Real Estate Lead:
