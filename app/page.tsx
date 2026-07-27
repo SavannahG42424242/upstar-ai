@@ -1,5 +1,14 @@
+"use client";
+
 import ChatBox from "@/components/ChatBox";
+
 export default function Home() {
+  function goToDemo() {
+    document
+      .getElementById("demo")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
 
@@ -9,7 +18,10 @@ export default function Home() {
           UpStar AI
         </h1>
 
-        <button className="rounded-lg bg-blue-600 px-5 py-2 font-semibold hover:bg-blue-700">
+        <button
+          onClick={goToDemo}
+          className="rounded-lg bg-blue-600 px-5 py-2 font-semibold hover:bg-blue-700"
+        >
           Get Started
         </button>
       </nav>
@@ -31,13 +43,21 @@ export default function Home() {
           capture leads, and create more opportunities 24/7.
         </p>
 
-        <button className="mt-10 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold hover:bg-blue-700">
+        <button
+          onClick={goToDemo}
+          className="mt-8 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+        >
           Book a Free Demo
         </button>
 
       </section>
 
-<ChatBox />
+
+      {/* Demo */}
+      <section id="demo" className="px-6 py-20">
+        <ChatBox />
+      </section>
+
 
       {/* How It Works */}
       <section className="px-8 py-20">
@@ -90,7 +110,10 @@ export default function Home() {
           Ready to capture more clients?
         </h2>
 
-        <button className="mt-8 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold hover:bg-blue-700">
+        <button
+          onClick={goToDemo}
+          className="mt-8 rounded-xl bg-blue-600 px-8 py-4 text-lg font-semibold hover:bg-blue-700"
+        >
           Start With UpStar AI
         </button>
 
