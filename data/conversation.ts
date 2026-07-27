@@ -1,7 +1,6 @@
 export const realEstateConversation = [
   {
     id: "welcome",
-    field: "goal",
     question:
       "👋 Welcome to UpStar AI! I'm here to help you find the perfect real estate expert. What brings you here today?",
     options: [
@@ -10,6 +9,7 @@ export const realEstateConversation = [
       "💼 Investment Property",
       "💬 Just Exploring",
     ],
+    field: "goal",
   },
   {
     id: "location",
@@ -29,16 +29,16 @@ export const realEstateConversation = [
   {
     id: "name",
     field: "name",
-    question: "Great! What's your name?",
+    question: "Great. What's your name?",
   },
   {
     id: "email",
     field: "email",
-    question: "What email should the realtor use to contact you?",
+    question: "What email address should the realtor use to contact you?",
   },
   {
     id: "phone",
     field: "phone",
-    question: "What's the best phone number to reach you?",
+    question: "What phone number is best for a quick call or text?",
   },
 ];
