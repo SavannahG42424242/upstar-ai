@@ -88,14 +88,29 @@ function resetDemo() {
   <div className="mt-4 grid gap-2">
     {realEstateConversation[step].options.map((option) => (
       <button
-        key={option}
-        onClick={() => {
-          setMessage(option);
-        }}
-        className="rounded-lg border p-3 text-left hover:bg-gray-100"
-      >
-        {option}
-      </button>
+  key={option}
+  onClick={() => {
+    const currentField = realEstateConversation[step].field;
+
+    if (currentField) {
+      setLead((prev) => ({
+        ...prev,
+        [currentField]: option,
+      }));
+    }
+
+    if (step < realEstateConversation.length - 1) {
+      const nextStep = step + 1;
+      setStep(nextStep);
+      setReply(realEstateConversation[nextStep].question);
+    }
+
+    setMessage("");
+  }}
+  className="rounded-lg border p-3 text-left hover:bg-gray-100"
+>
+  {option}
+</button>
     ))}
   </div>
 )}
