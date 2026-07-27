@@ -84,7 +84,21 @@ function resetDemo() {
     <p className="mt-3 text-gray-600">
       {reply}
     </p>
-
+{realEstateConversation[step].options && (
+  <div className="mt-4 grid gap-2">
+    {realEstateConversation[step].options.map((option) => (
+      <button
+        key={option}
+        onClick={() => {
+          setMessage(option);
+        }}
+        className="rounded-lg border p-3 text-left hover:bg-gray-100"
+      >
+        {option}
+      </button>
+    ))}
+  </div>
+)}
     <input
       className="mt-6 w-full rounded-lg border p-3"
       placeholder="Type your answer..."
