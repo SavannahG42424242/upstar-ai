@@ -25,12 +25,16 @@ export default function ChatBox() {
 
   const currentField = realEstateConversation[step].field;
 
-  if (currentField) {
-    setLead((prev) => ({
-      ...prev,
-      [currentField]: message,
-    }));
-  }
+  let updatedLead = lead;
+
+if (currentField) {
+  updatedLead = {
+    ...lead,
+    [currentField]: message,
+  };
+
+  setLead(updatedLead);
+}
 
   if (step < realEstateConversation.length - 1) {
     const nextStep = step + 1;
@@ -47,7 +51,7 @@ export default function ChatBox() {
   headers: {
     "Content-Type": "application/json",
   },
-  body: JSON.stringify(lead),
+  body: JSON.stringify(updatedLead),
 });
 }
 
