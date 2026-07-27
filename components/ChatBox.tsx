@@ -42,6 +42,13 @@ export default function ChatBox() {
     "🎉 Thanks! Your information has been saved. A real estate professional will follow up shortly."
   );
   setCompleted(true);
+  fetch("/api/lead", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(lead),
+});
 }
 
   setMessage("");
