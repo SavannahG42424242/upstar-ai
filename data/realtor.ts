@@ -27,7 +27,7 @@ export const realtors = {
   name: "Francie Malina",
   company: "The Francie Malina Team",
   city: "Westchester County",
-  email: "demo@upstarai.com",
+  email: "savannahgraf@gmail.com",
   phone: "(555) 555-5555",
 },
 };

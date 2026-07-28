@@ -5,7 +5,7 @@ import { getConversation } from "@/data/conversation";
 import { Realtor, realtors } from "@/data/realtor";
 
 export default function ChatBox() {
- const [selectedRealtor, setSelectedRealtor] = useState<Realtor>("francie");
+  const [selectedRealtor, setSelectedRealtor] = useState<Realtor>("francie");
   const conversation = getConversation(selectedRealtor);
 
   const [message, setMessage] = useState("");
@@ -77,7 +77,10 @@ export default function ChatBox() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedLead),
+        body: JSON.stringify({
+          ...updatedLead,
+          realtorEmail: realtors[selectedRealtor].email,
+        }),
       });
     }
 
@@ -119,16 +122,13 @@ export default function ChatBox() {
         ))}
       </select>
 
-
       <h2 className="text-xl font-bold">
         UpStar AI Assistant
       </h2>
 
-
       <p className="mt-3 text-gray-600">
         {reply}
       </p>
-
 
       {conversation[step].options && (
         <div className="mt-4 grid gap-2">
@@ -161,7 +161,6 @@ export default function ChatBox() {
         </div>
       )}
 
-
       <input
         className="mt-6 w-full rounded-lg border p-3"
         placeholder="Type your answer..."
@@ -169,14 +168,12 @@ export default function ChatBox() {
         onChange={(e) => setMessage(e.target.value)}
       />
 
-
       <button
         onClick={sendMessage}
         className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white"
       >
         Send Message
       </button>
-
 
       {completed && (
         <div className="mt-6 rounded-xl bg-blue-50 p-5 text-sm shadow">
@@ -198,7 +195,6 @@ export default function ChatBox() {
 
         </div>
       )}
-
 
       <button
         onClick={resetDemo}
