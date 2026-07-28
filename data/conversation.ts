@@ -1,44 +1,50 @@
-export const realEstateConversation = [
-  {
-    id: "welcome",
-    question:
-      "👋 Welcome to UpStar AI! I'm here to help you find the perfect real estate expert. What brings you here today?",
-    options: [
-      "🏡 Buy a Home",
-      "🏠 Sell a Home",
-      "💼 Investment Property",
-      "💬 Just Exploring",
-    ],
-    field: "goal",
-  },
-  {
-    id: "location",
-    field: "location",
-    question: "Great! What area are you interested in?",
-  },
-  {
-    id: "budget",
-    field: "budget",
-    question: "What's your approximate budget?",
-  },
-  {
-    id: "timeline",
-    field: "timeline",
-    question: "When are you hoping to move?",
-  },
-  {
-    id: "name",
-    field: "name",
-    question: "Great. What's your name?",
-  },
-  {
-    id: "email",
-    field: "email",
-    question: "What email address should the realtor use to contact you?",
-  },
-  {
-    id: "phone",
-    field: "phone",
-    question: "What phone number is best for a quick call or text?",
-  },
-];
+import { getRealtor, } from "./currentRealtor";
+import { Realtor } from "./realtor";
+
+export function getConversation(selectedRealtor: Realtor) {
+  const realtor = getRealtor(selectedRealtor);
+
+  return [
+    {
+      id: "goal",
+      field: "goal",
+      question: `👋 Welcome to ${realtor.company}! I'm UpStar AI, your virtual assistant for ${realtor.name}. Are you looking to buy, sell, invest, or just explore today?`,
+      options: [
+        "🏡 Buy a Home",
+        "🏠 Sell a Home",
+        "💼 Investment Property",
+        "💬 Just Exploring",
+      ],
+    },
+    {
+      id: "location",
+      field: "location",
+      question: `Great! What area in or around ${realtor.city} are you interested in?`,
+    },
+    {
+      id: "budget",
+      field: "budget",
+      question: "What's your approximate budget?",
+    },
+    {
+      id: "timeline",
+      field: "timeline",
+      question: "When are you hoping to move?",
+    },
+    {
+      id: "name",
+      field: "name",
+      question: "What's your full name?",
+    },
+    {
+      id: "email",
+      field: "email",
+      question: "What's the best email address to reach you?",
+    },
+    {
+      id: "phone",
+      field: "phone",
+      question: "What's the best phone number to reach you?",
+    },
+  ];
+}
