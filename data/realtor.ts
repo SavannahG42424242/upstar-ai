@@ -22,6 +22,14 @@ export const realtors = {
     email: "demo@upstarai.com",
     phone: "(555) 555-5555",
   },
+
+  francie: {
+  name: "Francie Malina",
+  company: "The Francie Malina Team",
+  city: "Westchester County",
+  email: "demo@upstarai.com",
+  phone: "(555) 555-5555",
+},
 };
 
 export type Realtor = keyof typeof realtors;
