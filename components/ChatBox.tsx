@@ -5,8 +5,7 @@ import { getConversation } from "@/data/conversation";
 import { Realtor, realtors } from "@/data/realtor";
 
 export default function ChatBox() {
-  const [selectedRealtor, setSelectedRealtor] = useState<Realtor>("sarah");
-
+ const [selectedRealtor, setSelectedRealtor] = useState<Realtor>("francie");
   const conversation = getConversation(selectedRealtor);
 
   const [message, setMessage] = useState("");
