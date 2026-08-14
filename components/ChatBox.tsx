@@ -4,8 +4,16 @@ import { useState } from "react";
 import { getConversation } from "@/data/conversation";
 import { Realtor, realtors } from "@/data/realtor";
 
-export default function ChatBox() {
-  const [selectedRealtor, setSelectedRealtor] = useState<Realtor>("francie");
+type ChatBoxProps = {
+  initialRealtor?: Realtor;
+};
+
+export default function ChatBox({
+  initialRealtor = "francie",
+}: ChatBoxProps) {
+  const [selectedRealtor, setSelectedRealtor] =
+    useState<Realtor>(initialRealtor);
+
   const conversation = getConversation(selectedRealtor);
 
   const [message, setMessage] = useState("");
@@ -102,7 +110,7 @@ export default function ChatBox() {
       phone: "",
     });
 
-    setReply(conversation[0].question);
+    setReply(getConversation(selectedRealtor)[0].question);
   }
 
   return (
@@ -136,7 +144,8 @@ export default function ChatBox() {
             <button
               key={option}
               onClick={() => {
-                const currentField = conversation[step].field;
+                const currentField =
+                  conversation[step].field;
 
                 if (currentField) {
                   setLead((prev) => ({
@@ -145,10 +154,16 @@ export default function ChatBox() {
                   }));
                 }
 
-                if (step < conversation.length - 1) {
+                if (
+                  step <
+                  conversation.length - 1
+                ) {
                   const nextStep = step + 1;
+
                   setStep(nextStep);
-                  setReply(conversation[nextStep].question);
+                  setReply(
+                    conversation[nextStep].question
+                  );
                 }
 
                 setMessage("");
@@ -165,7 +180,9 @@ export default function ChatBox() {
         className="mt-6 w-full rounded-lg border p-3"
         placeholder="Type your answer..."
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) =>
+          setMessage(e.target.value)
+        }
       />
 
       <button
@@ -182,16 +199,42 @@ export default function ChatBox() {
             🎉 New Lead Captured
           </h3>
 
-          <p><strong>Goal:</strong> {lead.goal || "-"}</p>
-          <p><strong>Location:</strong> {lead.location || "-"}</p>
-          <p><strong>Budget:</strong> {lead.budget || "-"}</p>
-          <p><strong>Timeline:</strong> {lead.timeline || "-"}</p>
+          <p>
+            <strong>Goal:</strong>{" "}
+            {lead.goal || "-"}
+          </p>
+
+          <p>
+            <strong>Location:</strong>{" "}
+            {lead.location || "-"}
+          </p>
+
+          <p>
+            <strong>Budget:</strong>{" "}
+            {lead.budget || "-"}
+          </p>
+
+          <p>
+            <strong>Timeline:</strong>{" "}
+            {lead.timeline || "-"}
+          </p>
 
           <hr className="my-3" />
 
-          <p><strong>Name:</strong> {lead.name || "-"}</p>
-          <p><strong>Email:</strong> {lead.email || "-"}</p>
-          <p><strong>Phone:</strong> {lead.phone || "-"}</p>
+          <p>
+            <strong>Name:</strong>{" "}
+            {lead.name || "-"}
+          </p>
+
+          <p>
+            <strong>Email:</strong>{" "}
+            {lead.email || "-"}
+          </p>
+
+          <p>
+            <strong>Phone:</strong>{" "}
+            {lead.phone || "-"}
+          </p>
 
         </div>
       )}
