@@ -3,7 +3,11 @@ export const realtors = {
     name: "Sarah Johnson",
     company: "Johnson Realty",
     city: "Westchester County",
-    email: "hello@upstarai.com",
+
+    // For demos, keep this as YOUR email.
+    // Change this only after a customer signs up.
+    notificationEmail: "savannahgraf@gmail.com",
+
     phone: "(555) 555-5555",
 
     serviceAreas: [
@@ -26,7 +30,9 @@ export const realtors = {
     name: "Michael Davis",
     company: "Davis Homes",
     city: "New York City",
-    email: "demo@upstarai.com",
+
+    notificationEmail: "savannahgraf@gmail.com",
+
     phone: "(555) 555-5555",
 
     serviceAreas: [
@@ -49,7 +55,9 @@ export const realtors = {
     name: "Emma Wilson",
     company: "Wilson Real Estate",
     city: "Hoboken",
-    email: "demo@upstarai.com",
+
+    notificationEmail: "savannahgraf@gmail.com",
+
     phone: "(555) 555-5555",
 
     serviceAreas: [
@@ -72,7 +80,9 @@ export const realtors = {
     name: "Francie Malina",
     company: "The Francie Malina Team",
     city: "Westchester County",
-    email: "savannahgraf@gmail.com",
+
+    notificationEmail: "savannahgraf@gmail.com",
+
     phone: "(555) 555-5555",
 
     serviceAreas: [
@@ -98,7 +108,9 @@ export const realtors = {
     name: "The Barry Team",
     company: "The Barry Team at Compass",
     city: "Larchmont, NY",
-    email: "savannahgraf@gmail.com",
+
+    notificationEmail: "savannahgraf@gmail.com",
+
     phone: "(914) 715-1584",
 
     serviceAreas: [

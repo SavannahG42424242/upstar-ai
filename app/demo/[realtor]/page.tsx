@@ -8,7 +8,9 @@ type Props = {
   }>;
 };
 
-export default async function RealtorDemo({ params }: Props) {
+export default async function RealtorDemo({
+  params,
+}: Props) {
   const { realtor } = await params;
 
   if (!(realtor in realtors)) {
@@ -20,23 +22,36 @@ export default async function RealtorDemo({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-12 text-white">
+
       <div className="mx-auto max-w-4xl text-center">
 
-        <p className="text-sm font-semibold uppercase tracking-widest text-blue-400">
+        <div className="text-sm font-semibold uppercase tracking-[0.25em] text-blue-400">
           UpStar AI
-        </p>
+        </div>
 
-        <h1 className="mt-4 text-4xl font-bold md:text-5xl">
-          AI Website Assistant Demo
+        <h1 className="mt-5 text-4xl font-bold md:text-5xl">
+          Meet Your New AI Website Assistant
         </h1>
 
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
-          A personalized demo created for {profile.company}.
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-300">
+          A personalized AI lead assistant designed
+          for{" "}
+          <span className="font-semibold text-white">
+            {profile.company}
+          </span>
+          .
         </p>
 
-        <div className="mt-8">
-          <ChatBox initialRealtor={selectedRealtor} />
+        <div className="mt-10">
+          <ChatBox
+            initialRealtor={selectedRealtor}
+            showRealtorSelector={false}
+          />
         </div>
+
+        <p className="mx-auto mt-8 max-w-xl text-sm text-slate-500">
+          This is a personalized UpStar AI demonstration.
+        </p>
 
       </div>
     </main>

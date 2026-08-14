@@ -6,6 +6,7 @@ import { Realtor, realtors } from "@/data/realtor";
 
 type ChatBoxProps = {
   initialRealtor?: Realtor;
+  showRealtorSelector?: boolean;
 };
 
 const emptyLead = {
@@ -16,11 +17,11 @@ const emptyLead = {
   name: "",
   email: "",
   phone: "",
-  specialties: "",
 };
 
 export default function ChatBox({
   initialRealtor = "francie",
+  showRealtorSelector = false,
 }: ChatBoxProps) {
   const [selectedRealtor, setSelectedRealtor] =
     useState<Realtor>(initialRealtor);
@@ -30,29 +31,28 @@ export default function ChatBox({
   const [message, setMessage] = useState("");
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState(false);
-
+  const [submitting, setSubmitting] = useState(false);
   const [lead, setLead] = useState(emptyLead);
 
-  const reply = conversation[step]?.question ?? "";
+  const currentQuestion = conversation[step]?.question ?? "";
+
+  function resetLead() {
+    setLead(emptyLead);
+    setMessage("");
+    setStep(0);
+    setCompleted(false);
+  }
 
   function switchRealtor(value: Realtor) {
     setSelectedRealtor(value);
-    setStep(0);
-    setCompleted(false);
-    setMessage("");
-    setLead(emptyLead);
-  }
-
-  function saveLead(field: string, value: string) {
-    setLead((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    resetLead();
   }
 
   async function submitLead(finalLead: typeof emptyLead) {
+    setSubmitting(true);
+
     try {
-      await fetch("/api/lead", {
+      const response = await fetch("/api/lead", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,18 +60,26 @@ export default function ChatBox({
         body: JSON.stringify({
           ...finalLead,
           realtorKey: selectedRealtor,
-          realtorName: realtors[selectedRealtor].name,
-          realtorCompany: realtors[selectedRealtor].company,
-          realtorEmail: realtors[selectedRealtor].email,
         }),
       });
+
+      if (!response.ok) {
+        throw new Error("Lead submission failed");
+      }
+
+      setCompleted(true);
     } catch (error) {
       console.error("Lead submission failed:", error);
+      alert(
+        "We couldn't submit your information. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
     }
   }
 
   function advance(value: string) {
-    if (!value.trim()) return;
+    if (!value.trim() || submitting) return;
 
     const currentField = conversation[step]?.field;
 
@@ -79,7 +87,7 @@ export default function ChatBox({
       ...lead,
       ...(currentField
         ? {
-            [currentField]: value,
+            [currentField]: value.trim(),
           }
         : {}),
     };
@@ -87,149 +95,168 @@ export default function ChatBox({
     setLead(updatedLead);
 
     if (step < conversation.length - 1) {
-      const nextStep = step + 1;
-      setStep(nextStep);
-    } else {
-      setCompleted(true);
-      submitLead(updatedLead);
+      setStep(step + 1);
+      setMessage("");
+      return;
     }
 
     setMessage("");
-  }
-
-  function resetDemo() {
-    setMessage("");
-    setStep(0);
-    setCompleted(false);
-    setLead(emptyLead);
+    submitLead(updatedLead);
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-md rounded-2xl bg-white p-6 text-black shadow-xl">
+    <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-6 text-left text-black shadow-2xl">
 
-      {/* Internal demo selector */}
-      <select
-        className="mb-4 w-full rounded-lg border p-3"
-        value={selectedRealtor}
-        onChange={(e) =>
-          switchRealtor(e.target.value as Realtor)
-        }
-      >
-        {Object.entries(realtors).map(([key, realtor]) => (
-          <option key={key} value={key}>
-            {realtor.company}
-          </option>
-        ))}
-      </select>
-
-      <h2 className="text-xl font-bold">
-        UpStar AI Assistant
-      </h2>
-
-      <p className="mt-3 text-gray-600">
-        {completed
-          ? "🎉 Thanks! Your information has been saved. A real estate professional will follow up shortly."
-          : reply}
-      </p>
-
-      {!completed && conversation[step]?.options && (
-        <div className="mt-4 grid gap-2">
-          {conversation[step].options.map((option) => (
-            <button
-              key={option}
-              onClick={() => advance(option)}
-              className="rounded-lg border p-3 text-left transition hover:bg-gray-100"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
+      {/* Internal development selector */}
+      {showRealtorSelector && (
+        <select
+          className="mb-5 w-full rounded-xl border border-gray-300 p-3"
+          value={selectedRealtor}
+          onChange={(e) =>
+            switchRealtor(e.target.value as Realtor)
+          }
+        >
+          {Object.entries(realtors).map(
+            ([key, realtor]) => (
+              <option key={key} value={key}>
+                {realtor.company}
+              </option>
+            )
+          )}
+        </select>
       )}
 
-      {!completed && !conversation[step]?.options && (
+      <div className="mb-5">
+        <div className="text-sm font-semibold uppercase tracking-wider text-blue-600">
+          UpStar AI
+        </div>
+
+        <h2 className="mt-1 text-2xl font-bold">
+          {realtors[selectedRealtor].company}
+        </h2>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Virtual real estate assistant
+        </p>
+      </div>
+
+      {!completed ? (
         <>
-          <input
-            className="mt-6 w-full rounded-lg border p-3"
-            placeholder="Type your answer..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                advance(message);
-              }
-            }}
-          />
+          <div className="rounded-2xl bg-gray-50 p-5">
+            <p className="leading-relaxed text-gray-700">
+              {currentQuestion}
+            </p>
+          </div>
+
+          {conversation[step]?.options && (
+            <div className="mt-4 grid gap-2">
+              {conversation[step].options.map(
+                (option) => (
+                  <button
+                    key={option}
+                    onClick={() => advance(option)}
+                    disabled={submitting}
+                    className="rounded-xl border border-gray-200 p-3 text-left transition hover:border-blue-400 hover:bg-blue-50 disabled:opacity-50"
+                  >
+                    {option}
+                  </button>
+                )
+              )}
+            </div>
+          )}
+
+          {!conversation[step]?.options && (
+            <>
+              <input
+                className="mt-5 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-blue-500"
+                placeholder="Type your answer..."
+                value={message}
+                disabled={submitting}
+                onChange={(e) =>
+                  setMessage(e.target.value)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    advance(message);
+                  }
+                }}
+              />
+
+              <button
+                onClick={() => advance(message)}
+                disabled={
+                  !message.trim() || submitting
+                }
+                className="mt-3 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submitting
+                  ? "Saving..."
+                  : "Continue"}
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="rounded-2xl bg-blue-50 p-5">
+            <h3 className="text-xl font-bold text-blue-700">
+              🎉 Thanks!
+            </h3>
+
+            <p className="mt-2 text-gray-700">
+              Your information has been sent to{" "}
+              {realtors[selectedRealtor].company}.
+              Someone from the team will be in touch
+              shortly.
+            </p>
+          </div>
+
+          <div className="mt-5 rounded-2xl border bg-gray-50 p-5 text-sm">
+            <h3 className="mb-3 font-bold">
+              Lead information
+            </h3>
+
+            <p>
+              <strong>Goal:</strong> {lead.goal}
+            </p>
+
+            <p>
+              <strong>Location:</strong>{" "}
+              {lead.location}
+            </p>
+
+            <p>
+              <strong>Budget:</strong> {lead.budget}
+            </p>
+
+            <p>
+              <strong>Timeline:</strong>{" "}
+              {lead.timeline}
+            </p>
+
+            <hr className="my-3" />
+
+            <p>
+              <strong>Name:</strong> {lead.name}
+            </p>
+
+            <p>
+              <strong>Email:</strong> {lead.email}
+            </p>
+
+            <p>
+              <strong>Phone:</strong> {lead.phone}
+            </p>
+          </div>
 
           <button
-            onClick={() => advance(message)}
-            className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
+            onClick={resetLead}
+            className="mt-4 w-full rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white hover:bg-gray-800"
           >
-            Send Message
+            Start New Conversation
           </button>
         </>
       )}
-
-      {completed && (
-        <div className="mt-6 rounded-xl bg-blue-50 p-5 text-sm shadow">
-
-          <h3 className="mb-4 text-xl font-bold text-blue-700">
-            🎉 New Lead Captured
-          </h3>
-
-          <p>
-            <strong>Goal:</strong>{" "}
-            {lead.goal || "-"}
-          </p>
-
-          <p>
-            <strong>Location:</strong>{" "}
-            {lead.location || "-"}
-          </p>
-
-          <p>
-            <strong>Budget:</strong>{" "}
-            {lead.budget || "-"}
-          </p>
-
-          <p>
-            <strong>Timeline:</strong>{" "}
-            {lead.timeline || "-"}
-          </p>
-
-          <hr className="my-3" />
-
-          <p>
-            <strong>Name:</strong>{" "}
-            {lead.name || "-"}
-          </p>
-
-          <p>
-            <strong>Email:</strong>{" "}
-            {lead.email || "-"}
-          </p>
-
-          <p>
-            <strong>Phone:</strong>{" "}
-            {lead.phone || "-"}
-          </p>
-
-          <hr className="my-3" />
-
-          <p>
-            <strong>Interest:</strong>{" "}
-            {lead.specialties || "-"}
-          </p>
-
-        </div>
-      )}
-
-      <button
-        onClick={resetDemo}
-        className="mt-4 w-full rounded-lg bg-gray-800 px-4 py-3 font-semibold text-white transition hover:bg-gray-900"
-      >
-        Start New Demo
-      </button>
-
     </div>
   );
 }
