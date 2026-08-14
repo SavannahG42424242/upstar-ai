@@ -1,87 +1,111 @@
-import { Resend } from "resend";
-import { realtors, Realtor } from "@/data/realtor";
+import { createClient } from "@supabase/supabase-js";
 
-const resend = new Resend(
-  process.env.RESEND_API_KEY
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function POST(request: Request) {
   try {
-    const lead = await request.json();
+    const body = await request.json();
 
-    const realtorKey = lead.realtorKey as Realtor;
+    const {
+      customerId,
+      goal,
+      location,
+      budget,
+      timeline,
+      name,
+      email,
+      phone,
+    } = body;
 
-    if (!realtorKey || !(realtorKey in realtors)) {
+    console.log("UPSTAR LEAD RECEIVED:", {
+      customerId,
+      goal,
+      location,
+      budget,
+      timeline,
+      name,
+      email,
+      phone,
+    });
+
+    // Make sure the customer ID exists.
+    if (!customerId) {
       return Response.json(
         {
           success: false,
-          error: "Invalid realtor",
+          error: "Missing customerId",
         },
         { status: 400 }
       );
     }
 
-    const realtor = realtors[realtorKey];
+    // Make sure it actually looks like a UUID.
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-    const result = await resend.emails.send({
-      from: "UpStar AI <onboarding@resend.dev>",
+    if (!uuidRegex.test(customerId)) {
+      return Response.json(
+        {
+          success: false,
+          error: `Invalid customerId: ${customerId}`,
+        },
+        { status: 400 }
+      );
+    }
 
-      to: realtor.notificationEmail,
+    const { data: lead, error } =
+      await supabase
+        .from("leads")
+        .insert({
+          customer_id: customerId,
+          goal,
+          location,
+          budget,
+          timeline,
+          name,
+          email,
+          phone,
+        })
+        .select()
+        .single();
 
-      subject:
-        `New UpStar AI Lead — ${realtor.company}`,
+    if (error) {
+      console.error(
+        "SUPABASE LEAD ERROR:",
+        error
+      );
 
-      text: `
-NEW UPSTAR AI LEAD
-
-Company:
-${realtor.company}
-
-Goal:
-${lead.goal}
-
-Location:
-${lead.location}
-
-Budget:
-${lead.budget}
-
-Timeline:
-${lead.timeline}
-
-Name:
-${lead.name}
-
-Email:
-${lead.email}
-
-Phone:
-${lead.phone}
-
-Realtor Profile:
-${realtorKey}
-      `,
-    });
+      return Response.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 500 }
+      );
+    }
 
     console.log(
-      "UPSTAR LEAD EMAIL SENT:",
-      result
+      "UPSTAR LEAD SAVED:",
+      lead
     );
 
     return Response.json({
       success: true,
+      lead,
     });
-
   } catch (error) {
     console.error(
-      "UPSTAR LEAD ERROR:",
+      "LEAD API ERROR:",
       error
     );
 
     return Response.json(
       {
         success: false,
-        error: "Unable to process lead",
+        error: String(error),
       },
       { status: 500 }
     );

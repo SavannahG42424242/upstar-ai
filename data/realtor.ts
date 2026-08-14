@@ -1,139 +1,62 @@
 export const realtors = {
+  barry: {
+    id: "4e758f12-7ab3-461a-9003-4906397af132",
+    name: "Barry",
+    company: "Barry Demo",
+    city: "Demo",
+    email: "savannahgraf@gmail.com",
+    phone: "5555555555",
+    serviceAreas: ["Demo"],
+    specialties: ["Residential Real Estate"],
+    greeting: "Hi! How can I help you today?",
+  },
+
   sarah: {
+    id: "",
     name: "Sarah Johnson",
     company: "Johnson Realty",
     city: "Westchester County",
-
-    // For demos, keep this as YOUR email.
-    // Change this only after a customer signs up.
-    notificationEmail: "savannahgraf@gmail.com",
-
+    email: "hello@upstarai.com",
     phone: "(555) 555-5555",
-
-    serviceAreas: [
-      "Westchester County",
-    ],
-
-    specialties: [
-      "Buying",
-      "Selling",
-      "Investment Properties",
-    ],
-
-    tone: "Friendly and professional",
-
-    greeting:
-      "Hi! 👋 I'm UpStar AI, the virtual assistant for Johnson Realty. Are you looking to buy, sell, invest, or just explore today?",
+    serviceAreas: ["Westchester County"],
+    specialties: ["Residential Real Estate"],
+    greeting: "Hi! How can I help you today?",
   },
 
   michael: {
+    id: "",
     name: "Michael Davis",
     company: "Davis Homes",
     city: "New York City",
-
-    notificationEmail: "savannahgraf@gmail.com",
-
+    email: "demo@upstarai.com",
     phone: "(555) 555-5555",
-
-    serviceAreas: [
-      "New York City",
-    ],
-
-    specialties: [
-      "Buying",
-      "Selling",
-      "Investment Properties",
-    ],
-
-    tone: "Friendly and professional",
-
-    greeting:
-      "Hi! 👋 I'm UpStar AI, the virtual assistant for Davis Homes. Are you looking to buy, sell, invest, or just explore today?",
+    serviceAreas: ["New York City"],
+    specialties: ["Residential Real Estate"],
+    greeting: "Hi! How can I help you today?",
   },
 
   emma: {
+    id: "",
     name: "Emma Wilson",
     company: "Wilson Real Estate",
     city: "Hoboken",
-
-    notificationEmail: "savannahgraf@gmail.com",
-
+    email: "demo@upstarai.com",
     phone: "(555) 555-5555",
-
-    serviceAreas: [
-      "Hoboken",
-    ],
-
-    specialties: [
-      "Buying",
-      "Selling",
-      "Investment Properties",
-    ],
-
-    tone: "Friendly and professional",
-
-    greeting:
-      "Hi! 👋 I'm UpStar AI, the virtual assistant for Wilson Real Estate. Are you looking to buy, sell, invest, or just explore today?",
+    serviceAreas: ["Hoboken"],
+    specialties: ["Residential Real Estate"],
+    greeting: "Hi! How can I help you today?",
   },
 
   francie: {
+    id: "",
     name: "Francie Malina",
     company: "The Francie Malina Team",
     city: "Westchester County",
-
-    notificationEmail: "savannahgraf@gmail.com",
-
+    email: "savannahgraf@gmail.com",
     phone: "(555) 555-5555",
-
-    serviceAreas: [
-      "Westchester County",
-      "Scarsdale",
-      "Bronxville",
-      "Rye",
-    ],
-
-    specialties: [
-      "Buying",
-      "Selling",
-      "Luxury Real Estate",
-    ],
-
-    tone: "Warm and professional",
-
-    greeting:
-      "Hi! 👋 I'm UpStar AI, the virtual assistant for The Francie Malina Team. Are you looking to buy, sell, invest, or just explore the Westchester market?",
-  },
-
-  barry: {
-    name: "The Barry Team",
-    company: "The Barry Team at Compass",
-    city: "Larchmont, NY",
-
-    notificationEmail: "savannahgraf@gmail.com",
-
-    phone: "(914) 715-1584",
-
-    serviceAreas: [
-      "Larchmont",
-      "Mamaroneck",
-      "New Rochelle",
-      "Rye",
-      "Harrison",
-    ],
-
-    specialties: [
-      "Buying",
-      "Selling",
-      "Relocation",
-      "Waterfront Properties",
-      "New Construction",
-      "Investment Properties",
-    ],
-
-    tone: "Professional and welcoming",
-
-    greeting:
-      "Hi! 👋 I'm UpStar AI, the virtual assistant for The Barry Team. Are you looking to buy, sell, invest, or explore the Larchmont and Sound Shore market?",
+    serviceAreas: ["Westchester County"],
+    specialties: ["Residential Real Estate"],
+    greeting: "Hi! How can I help you today?",
   },
 };
 
