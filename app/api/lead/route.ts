@@ -1,8 +1,26 @@
 import { createClient } from "@supabase/supabase-js";
 
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+const supabaseServiceRoleKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl) {
+  throw new Error(
+    "Missing NEXT_PUBLIC_SUPABASE_URL"
+  );
+}
+
+if (!supabaseServiceRoleKey) {
+  throw new Error(
+    "Missing SUPABASE_SERVICE_ROLE_KEY"
+  );
+}
+
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  supabaseUrl,
+  supabaseServiceRoleKey
 );
 
 export async function POST(request: Request) {
@@ -20,29 +38,21 @@ export async function POST(request: Request) {
       phone,
     } = body;
 
-    console.log("UPSTAR LEAD RECEIVED:", {
-      customerId,
-      goal,
-      location,
-      budget,
-      timeline,
-      name,
-      email,
-      phone,
-    });
+    console.log(
+      "UPSTAR LEAD RECEIVED:",
+      body
+    );
 
-    // Make sure the customer ID exists.
     if (!customerId) {
       return Response.json(
         {
           success: false,
-          error: "Missing customerId",
+          error: "Missing customerId.",
         },
         { status: 400 }
       );
     }
 
-    // Make sure it actually looks like a UUID.
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -50,7 +60,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           success: false,
-          error: `Invalid customerId: ${customerId}`,
+          error: `Invalid customerId UUID: ${customerId}`,
         },
         { status: 400 }
       );
@@ -61,13 +71,13 @@ export async function POST(request: Request) {
         .from("leads")
         .insert({
           customer_id: customerId,
-          goal,
-          location,
-          budget,
-          timeline,
-          name,
-          email,
-          phone,
+          goal: goal || "",
+          location: location || "",
+          budget: budget || "",
+          timeline: timeline || "",
+          name: name || "",
+          email: email || "",
+          phone: phone || "",
         })
         .select()
         .single();
@@ -105,7 +115,10 @@ export async function POST(request: Request) {
     return Response.json(
       {
         success: false,
-        error: String(error),
+        error:
+          error instanceof Error
+            ? error.message
+            : String(error),
       },
       { status: 500 }
     );
