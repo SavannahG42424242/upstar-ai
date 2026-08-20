@@ -1,11 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { getConversation } from "@/data/conversation";
-import { Realtor, realtors } from "@/data/realtor";
+
+type Customer = {
+  id: string;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  city: string;
+  website: string;
+  service_areas: string;
+  specialties: string;
+  greeting: string;
+  slug: string;
+  industry: string;
+  settings: Record<string, unknown>;
+};
 
 type ChatBoxProps = {
-  initialRealtor?: Realtor;
+  customer: Customer;
   showRealtorSelector?: boolean;
 };
 
@@ -30,38 +44,81 @@ const emptyLead: Lead = {
 };
 
 export default function ChatBox({
-  initialRealtor = "francie",
-  showRealtorSelector = false,
+  customer,
 }: ChatBoxProps) {
-  const [selectedRealtor, setSelectedRealtor] =
-    useState<Realtor>(initialRealtor);
-
-  const [message, setMessage] = useState("");
   const [step, setStep] = useState(0);
+  const [message, setMessage] = useState("");
   const [completed, setCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [lead, setLead] = useState<Lead>(emptyLead);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const conversation = getConversation(selectedRealtor);
+  /*
+   * Questions asked by the UpStar AI assistant.
+   */
+  const questions = [
+    {
+      field: "goal" as const,
+      question: "What are you looking to do?",
+      options: [
+        "🏡 Buy a Home",
+        "🏠 Sell a Home",
+        "💰 Invest in Real Estate",
+      ],
+    },
+    {
+      field: "location" as const,
+      question: "What area are you interested in?",
+    },
+    {
+      field: "budget" as const,
+      question: "What's your approximate budget?",
+    },
+    {
+      field: "timeline" as const,
+      question: "When are you hoping to move?",
+      options: [
+        "ASAP",
+        "1–3 Months",
+        "3–6 Months",
+        "6+ Months",
+        "Just Exploring",
+      ],
+    },
+    {
+      field: "name" as const,
+      question: "What's your name?",
+    },
+    {
+      field: "email" as const,
+      question: "What's the best email to reach you?",
+    },
+    {
+      field: "phone" as const,
+      question: "What's the best phone number to reach you?",
+    },
+  ];
 
-  const realtor = realtors[selectedRealtor];
-
+  /*
+   * IMPORTANT:
+   * The current step directly matches the current question.
+   *
+   * step 0 = goal
+   * step 1 = location
+   * step 2 = budget
+   * step 3 = timeline
+   * step 4 = name
+   * step 5 = email
+   * step 6 = phone
+   */
   const currentQuestion =
-    conversation[step]?.question ??
+    questions[step]?.question ||
     "Thanks for your interest!";
 
-  function resetLead() {
-    setLead(emptyLead);
-    setMessage("");
-    setStep(0);
-    setCompleted(false);
-    setSubmitting(false);
-    setErrorMessage("");
-  }
+  const currentOptions =
+    questions[step]?.options || [];
 
-  function switchRealtor(value: Realtor) {
-    setSelectedRealtor(value);
+  function resetLead() {
     setLead(emptyLead);
     setMessage("");
     setStep(0);
@@ -75,25 +132,11 @@ export default function ChatBox({
     setErrorMessage("");
 
     try {
-      /*
-       * IMPORTANT:
-       * The API expects customerId to be a UUID.
-       * We get that UUID from the selected realtor.
-       */
-      const customerId = realtor?.id;
+      const customerId = customer.id;
 
       if (!customerId) {
         throw new Error(
-          "This realtor does not have a Supabase customer ID yet."
-        );
-      }
-
-      const uuidRegex =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-      if (!uuidRegex.test(customerId)) {
-        throw new Error(
-          `Invalid realtor UUID: ${customerId}`
+          "This business does not have a customer ID."
         );
       }
 
@@ -115,11 +158,6 @@ export default function ChatBox({
         }),
       });
 
-      /*
-       * Read the response as text first.
-       * This prevents the frontend from crashing if the API
-       * accidentally returns something that isn't valid JSON.
-       */
       const responseText = await response.text();
 
       let result: any = {};
@@ -158,12 +196,11 @@ export default function ChatBox({
         error
       );
 
-      const message =
+      setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Something went wrong.";
-
-      setErrorMessage(message);
+          : "Something went wrong."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -179,10 +216,11 @@ export default function ChatBox({
     setErrorMessage("");
 
     const currentField =
-      conversation[step]?.field;
+      questions[step]?.field;
 
     const updatedLead: Lead = {
       ...lead,
+
       ...(currentField
         ? {
             [currentField]: cleanValue,
@@ -193,16 +231,18 @@ export default function ChatBox({
     setLead(updatedLead);
 
     /*
-     * There are still questions remaining.
+     * If there are more questions,
+     * move to the next question.
      */
-    if (step < conversation.length - 1) {
+    if (step < questions.length - 1) {
       setStep(step + 1);
       setMessage("");
       return;
     }
 
     /*
-     * This was the final question.
+     * The phone number was the final question,
+     * so submit the lead.
      */
     setMessage("");
 
@@ -212,59 +252,50 @@ export default function ChatBox({
   return (
     <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-6 text-left text-black shadow-2xl">
 
-      {/* DEVELOPMENT REALTOR SELECTOR */}
-      {showRealtorSelector && (
-        <select
-          className="mb-5 w-full rounded-xl border border-gray-300 p-3"
-          value={selectedRealtor}
-          onChange={(e) =>
-            switchRealtor(
-              e.target.value as Realtor
-            )
-          }
-        >
-          {Object.entries(realtors).map(
-            ([key, realtorData]) => (
-              <option
-                key={key}
-                value={key}
-              >
-                {realtorData.company}
-              </option>
-            )
-          )}
-        </select>
-      )}
-
       {/* HEADER */}
+
       <div className="mb-5">
+
         <div className="text-sm font-semibold uppercase tracking-wider text-blue-600">
           UpStar AI
         </div>
 
         <h2 className="mt-1 text-2xl font-bold">
-          {realtor.company}
+          {customer.company}
         </h2>
 
         <p className="mt-1 text-sm text-gray-500">
-          Virtual real estate assistant
+          Virtual{" "}
+          {customer.industry ||
+            "business"}{" "}
+          assistant
         </p>
+
       </div>
 
-      {/* CHAT */}
+      {/* CONVERSATION */}
+
       {!completed ? (
         <>
+
           {/* QUESTION */}
+
           <div className="rounded-2xl bg-gray-50 p-5">
+
             <p className="leading-relaxed text-gray-700">
               {currentQuestion}
             </p>
+
           </div>
 
           {/* ERROR */}
+
           {errorMessage && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-              <strong>Something went wrong:</strong>
+
+              <strong>
+                Something went wrong:
+              </strong>
 
               <div className="mt-1">
                 {errorMessage}
@@ -280,35 +311,39 @@ export default function ChatBox({
               >
                 Try Again
               </button>
+
             </div>
           )}
 
           {/* OPTIONS */}
-          {conversation[step]?.options &&
-            conversation[step].options.length >
-              0 && (
-              <div className="mt-4 grid gap-2">
-                {conversation[step].options.map(
-                  (option) => (
-                    <button
-                      type="button"
-                      key={option}
-                      onClick={() =>
-                        advance(option)
-                      }
-                      disabled={submitting}
-                      className="rounded-xl border border-gray-200 p-3 text-left transition hover:border-blue-400 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {option}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
+
+          {currentOptions.length > 0 && (
+            <div className="mt-4 grid gap-2">
+
+              {currentOptions.map(
+                (option) => (
+                  <button
+                    type="button"
+                    key={option}
+                    onClick={() =>
+                      advance(option)
+                    }
+                    disabled={submitting}
+                    className="rounded-xl border border-gray-200 p-3 text-left transition hover:border-blue-400 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {option}
+                  </button>
+                )
+              )}
+
+            </div>
+          )}
 
           {/* TEXT INPUT */}
-          {!conversation[step]?.options && (
+
+          {currentOptions.length === 0 && (
             <>
+
               <input
                 type="text"
                 className="mt-5 w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-blue-500"
@@ -316,10 +351,14 @@ export default function ChatBox({
                 value={message}
                 disabled={submitting}
                 onChange={(e) =>
-                  setMessage(e.target.value)
+                  setMessage(
+                    e.target.value
+                  )
                 }
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (
+                    e.key === "Enter"
+                  ) {
                     e.preventDefault();
                     advance(message);
                   }
@@ -341,72 +380,100 @@ export default function ChatBox({
                   ? "Saving..."
                   : "Continue"}
               </button>
+
             </>
           )}
+
         </>
       ) : (
+
+        /* SUCCESS */
+
         <>
-          {/* SUCCESS */}
+
           <div className="rounded-2xl bg-blue-50 p-5">
+
             <h3 className="text-xl font-bold text-blue-700">
               🎉 Thanks!
             </h3>
 
             <p className="mt-2 text-gray-700">
-              Your information has been sent to{" "}
-              {realtor.company}.
-              Someone from the team will be in touch
-              shortly.
+              Your information has
+              been sent to{" "}
+              {customer.company}.
+              Someone from the team
+              will be in touch shortly.
             </p>
+
           </div>
 
           {/* LEAD SUMMARY */}
+
           <div className="mt-5 rounded-2xl border bg-gray-50 p-5 text-sm">
+
             <h3 className="mb-3 font-bold">
               Lead information
             </h3>
 
             <div className="space-y-2">
+
               <p>
-                <strong>Goal:</strong>{" "}
+                <strong>
+                  Goal:
+                </strong>{" "}
                 {lead.goal}
               </p>
 
               <p>
-                <strong>Location:</strong>{" "}
+                <strong>
+                  Location:
+                </strong>{" "}
                 {lead.location}
               </p>
 
               <p>
-                <strong>Budget:</strong>{" "}
+                <strong>
+                  Budget:
+                </strong>{" "}
                 {lead.budget}
               </p>
 
               <p>
-                <strong>Timeline:</strong>{" "}
+                <strong>
+                  Timeline:
+                </strong>{" "}
                 {lead.timeline}
               </p>
 
               <hr className="my-3" />
 
               <p>
-                <strong>Name:</strong>{" "}
+                <strong>
+                  Name:
+                </strong>{" "}
                 {lead.name}
               </p>
 
               <p>
-                <strong>Email:</strong>{" "}
+                <strong>
+                  Email:
+                </strong>{" "}
                 {lead.email}
               </p>
 
               <p>
-                <strong>Phone:</strong>{" "}
+                <strong>
+                  Phone:
+                </strong>{" "}
                 {lead.phone}
               </p>
+
             </div>
+
           </div>
 
           {/* START OVER */}
+
           <button
             type="button"
             onClick={resetLead}
@@ -414,8 +481,10 @@ export default function ChatBox({
           >
             Start New Conversation
           </button>
+
         </>
       )}
+
     </div>
   );
 }

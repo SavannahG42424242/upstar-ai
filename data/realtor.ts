@@ -1,14 +1,30 @@
 export const realtors = {
   barry: {
     id: "4e758f12-7ab3-461a-9003-4906397af132",
-    name: "Barry",
-    company: "Barry Demo",
-    city: "Demo",
-    email: "savannahgraf@gmail.com",
-    phone: "5555555555",
-    serviceAreas: ["Demo"],
-    specialties: ["Residential Real Estate"],
-    greeting: "Hi! How can I help you today?",
+    name: "The Barry Team",
+    company: "The Barry Team",
+    city: "Larchmont, NY",
+    email: "barryteam@compass.com",
+    phone: "914.715.1584",
+
+    serviceAreas: [
+      "Larchmont",
+      "Mamaroneck",
+      "New Rochelle",
+      "Rye",
+      "Harrison",
+      "Pelham",
+    ],
+
+    specialties: [
+      "Residential Real Estate",
+      "Buying",
+      "Selling",
+      "Luxury Real Estate",
+    ],
+
+    greeting:
+      "Hi! I'm the Barry Team's virtual real estate assistant. How can I help you today?",
   },
 
   sarah: {
